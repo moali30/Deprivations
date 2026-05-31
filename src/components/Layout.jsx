@@ -6,20 +6,20 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
-      <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10 print:hidden">
+      <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-20 print:hidden">
         <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-          <Link to="/" className="flex items-center gap-2 text-indigo-600 font-bold text-xl">
+          <Link to="/" className="flex items-center gap-2 text-indigo-600 font-bold text-xl shrink-0">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             نظام الحرمان
           </Link>
-          <nav className="flex flex-wrap justify-center gap-4 md:gap-6 pt-2 md:pt-0">
-            <Link to="/" className={`font-bold transition-all pb-1 ${isActive('/')}`}>بوابة المرشد</Link>
-            <Link to="/control" className={`font-bold transition-all pb-1 ${isActive('/control')}`}>الكنترول</Link>
-            <Link to="/search" className={`font-bold transition-all pb-1 ${isActive('/search')}`}>البحث عن طالب</Link>
+          <nav className="flex overflow-x-auto w-full md:w-auto justify-start md:justify-center gap-5 md:gap-6 pt-1 md:pt-0 pb-2 md:pb-0 hide-scrollbar">
+            <Link to="/" className={`font-bold transition-all pb-1 whitespace-nowrap shrink-0 ${isActive('/')}`}>بوابة المرشد</Link>
+            <Link to="/control" className={`font-bold transition-all pb-1 whitespace-nowrap shrink-0 ${isActive('/control')}`}>الكنترول</Link>
+            <Link to="/search" className={`font-bold transition-all pb-1 whitespace-nowrap shrink-0 ${isActive('/search')}`}>البحث عن طالب</Link>
           </nav>
         </div>
       </header>
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 py-8">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-2 md:px-4 py-6 md:py-8">
         <Outlet />
       </main>
       <footer className="bg-white border-t border-slate-200 py-6 text-center text-slate-500 text-sm print:hidden">

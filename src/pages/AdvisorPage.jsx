@@ -19,7 +19,7 @@ export default function AdvisorPage() {
   }, []);
 
   async function fetchSubjects() {
-    const { data, error } = await supabase.from('subjects').select('*').order('name');
+    const { data } = await supabase.from('subjects').select('*').order('name');
     if (data) setSubjects(data);
   }
 
@@ -46,8 +46,7 @@ export default function AdvisorPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!advisorName || !studentName || !studentId || !specialty || selectedSubjects.length === 0) {
-      alert('الرجاء إكمال جميع الحقول واختيار مادة واحدة على الأقل');
-      return;
+      return alert('الرجاء إكمال جميع الحقول واختيار مادة واحدة على الأقل');
     }
     
     setIsSubmitting(true);
@@ -65,23 +64,13 @@ export default function AdvisorPage() {
     if (error) {
       alert('حدث خطأ: ' + error.message);
     } else {
-      // Add audit logs
       if (insertedDeps) {
         const auditLogs = insertedDeps.map(dep => {
           const sub = subjects.find(s => s.id === dep.subject_id);
-          return {
-            action_type: 'إضافة',
-            student_name: dep.student_name,
-            student_id: dep.student_id,
-            subject_name: sub ? sub.name : 'غير معروف',
-            editor_name: advisorName,
-            details: 'إضافة حرمان جديد'
-          };
+          return { action_type: 'إضافة', student_name: dep.student_name, student_id: dep.student_id, subject_name: sub ? sub.name : 'غير معروف', editor_name: advisorName, details: 'إضافة حرمان جديد' };
         });
-        // We do not await to not block UI, just let it run
         supabase.from('audit_logs').insert(auditLogs).then();
       }
-
       setMessage('تم تسجيل الحرمان بنجاح!');
       setStudentName('');
       setStudentId('');
@@ -97,15 +86,15 @@ export default function AdvisorPage() {
     <div className="max-w-2xl mx-auto">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="bg-indigo-50 px-6 py-4 border-b border-indigo-100">
-          <h1 className="text-xl font-bold text-indigo-900">تسجيل حرمان طالب</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-indigo-900">تسجيل حرمان طالب</h1>
           <p className="text-sm text-indigo-700 mt-1">نموذج الإرشاد الأكاديمي لإضافة الطلاب المحرومين</p>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
           {message && (
             <div className="bg-green-50 text-green-700 p-4 rounded-xl flex items-center gap-3 border border-green-200">
-              <CheckCircle className="w-5 h-5" />
-              <span className="font-bold">{message}</span>
+              <CheckCircle className="w-5 h-5 shrink-0" />
+              <span className="font-bold text-sm sm:text-base">{message}</span>
             </div>
           )}
 
@@ -154,9 +143,9 @@ export default function AdvisorPage() {
               )}
             </div>
 
-            <div className="flex gap-2 items-center bg-slate-50 p-3 rounded-xl border border-slate-200 mt-2">
-              <input type="text" value={newSubject} onChange={e => setNewSubject(e.target.value)} className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="اسم المادة الجديدة..." onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddSubject())} />
-              <button type="button" onClick={handleAddSubject} className="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors flex items-center gap-2 whitespace-nowrap">
+            <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center bg-slate-50 p-3 rounded-xl border border-slate-200 mt-2">
+              <input type="text" value={newSubject} onChange={e => setNewSubject(e.target.value)} className="flex-1 px-3 py-2.5 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="اسم المادة الجديدة..." onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddSubject())} />
+              <button type="button" onClick={handleAddSubject} className="bg-slate-800 hover:bg-slate-900 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
                 <PlusCircle className="w-4 h-4" /> إضافة مادة
               </button>
             </div>
@@ -170,7 +159,7 @@ export default function AdvisorPage() {
                   <span key={sub.id} className="bg-white text-indigo-700 border border-indigo-200 shadow-sm text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-2">
                     {sub.name}
                     <button type="button" onClick={() => toggleSubject(sub.id)} className="text-indigo-400 hover:text-red-500 transition-colors focus:outline-none">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </span>
                 ))}
