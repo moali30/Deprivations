@@ -59,12 +59,29 @@ export default function AdvisorPage() {
       advisor_name: advisorName
     }));
 
-    const { error } = await supabase.from('deprivations').insert(inserts);
+    const { data: insertedDeps, error } = await supabase.from('deprivations').insert(inserts).select();
     setIsSubmitting(false);
 
     if (error) {
       alert('حدث خطأ: ' + error.message);
     } else {
+      // Add audit logs
+      if (insertedDeps) {
+        const auditLogs = insertedDeps.map(dep => {
+          const sub = subjects.find(s => s.id === dep.subject_id);
+          return {
+            action_type: 'إضافة',
+            student_name: dep.student_name,
+            student_id: dep.student_id,
+            subject_name: sub ? sub.name : 'غير معروف',
+            editor_name: advisorName,
+            details: 'إضافة حرمان جديد'
+          };
+        });
+        // We do not await to not block UI, just let it run
+        supabase.from('audit_logs').insert(auditLogs).then();
+      }
+
       setMessage('تم تسجيل الحرمان بنجاح!');
       setStudentName('');
       setStudentId('');
@@ -145,7 +162,6 @@ export default function AdvisorPage() {
             </div>
           </div>
 
-          {/* Section to display selected subjects */}
           {selectedSubjectObjects.length > 0 && (
             <div className="pt-4 border-t border-slate-100 bg-indigo-50 p-4 rounded-xl border border-indigo-100 mt-4">
               <label className="text-sm font-bold text-indigo-900 block mb-3">المواد التي تم اختيارها للحرمان ({selectedSubjectObjects.length}):</label>

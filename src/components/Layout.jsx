@@ -1,17 +1,22 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 
 export default function Layout() {
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-600 hover:text-indigo-600 border-b-2 border-transparent';
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
       <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10 print:hidden">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
           <Link to="/" className="flex items-center gap-2 text-indigo-600 font-bold text-xl">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             نظام الحرمان
           </Link>
-          <nav className="flex gap-6">
-            <Link to="/" className="text-slate-600 hover:text-indigo-600 font-bold transition-colors">بوابة المرشد</Link>
-            <Link to="/control" className="text-slate-600 hover:text-indigo-600 font-bold transition-colors">الكنترول</Link>
+          <nav className="flex flex-wrap justify-center gap-4 md:gap-6 pt-2 md:pt-0">
+            <Link to="/" className={`font-bold transition-all pb-1 ${isActive('/')}`}>بوابة المرشد</Link>
+            <Link to="/control" className={`font-bold transition-all pb-1 ${isActive('/control')}`}>الكنترول</Link>
+            <Link to="/search" className={`font-bold transition-all pb-1 ${isActive('/search')}`}>البحث عن طالب</Link>
+            <Link to="/logs" className={`font-bold transition-all pb-1 ${isActive('/logs')}`}>سجل التغييرات</Link>
           </nav>
         </div>
       </header>
