@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { PlusCircle, Search, Save, CheckCircle } from 'lucide-react';
+import { PlusCircle, Search, Save, CheckCircle, X } from 'lucide-react';
 
 export default function AdvisorPage() {
   const [advisorName, setAdvisorName] = useState('');
