@@ -16,7 +16,6 @@ export default function Layout() {
             <Link to="/" className={`font-bold transition-all pb-1 ${isActive('/')}`}>بوابة المرشد</Link>
             <Link to="/control" className={`font-bold transition-all pb-1 ${isActive('/control')}`}>الكنترول</Link>
             <Link to="/search" className={`font-bold transition-all pb-1 ${isActive('/search')}`}>البحث عن طالب</Link>
-            <Link to="/logs" className={`font-bold transition-all pb-1 ${isActive('/logs')}`}>سجل التغييرات</Link>
           </nav>
         </div>
       </header>

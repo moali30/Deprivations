@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Printer, Search, Users, Calendar, AlertCircle, FileSpreadsheet, Edit, Trash2, X } from 'lucide-react';
+import { Printer, Search, Users, Calendar, AlertCircle, FileSpreadsheet, Edit, Trash2, X, History } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 export default function ControlPage() {
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [deprivations, setDeprivations] = useState([]);
+  const [subjectLogs, setSubjectLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [subjectSearch, setSubjectSearch] = useState('');
@@ -40,9 +41,19 @@ export default function ControlPage() {
     setLoading(false);
   }
 
+  async function fetchSubjectLogs(subjectName) {
+    const { data, error } = await supabase
+      .from('audit_logs')
+      .select('*')
+      .eq('subject_name', subjectName)
+      .order('created_at', { ascending: false });
+    if (data) setSubjectLogs(data);
+  }
+
   const handleSubjectSelect = (sub) => {
     setSelectedSubject(sub);
     fetchDeprivations(sub.id);
+    fetchSubjectLogs(sub.name);
   };
 
   const openModal = (type, dep) => {
@@ -68,27 +79,35 @@ export default function ControlPage() {
 
     try {
       if (modal.type === 'DELETE') {
-        await supabase.from('deprivations').delete().eq('id', modal.dep.id);
-        await supabase.from('audit_logs').insert([{
-          action_type: 'حذف',
-          student_name: modal.dep.student_name,
-          student_id: modal.dep.student_id,
-          subject_name: selectedSubject.name,
-          editor_name: editorName,
-          details: 'تم حذف الحرمان من التقرير'
-        }]);
-        setDeprivations(deprivations.filter(d => d.id !== modal.dep.id));
+        const { error: delError } = await supabase.from('deprivations').delete().eq('id', modal.dep.id);
+        if (!delError) {
+          const newLog = {
+            action_type: 'حذف',
+            student_name: modal.dep.student_name,
+            student_id: modal.dep.student_id,
+            subject_name: selectedSubject.name,
+            editor_name: editorName,
+            details: 'تم حذف الحرمان من التقرير'
+          };
+          const { data: logData } = await supabase.from('audit_logs').insert([newLog]).select();
+          setDeprivations(deprivations.filter(d => d.id !== modal.dep.id));
+          if (logData) setSubjectLogs([logData[0], ...subjectLogs]);
+        }
       } else if (modal.type === 'EDIT') {
-        await supabase.from('deprivations').update(editData).eq('id', modal.dep.id);
-        await supabase.from('audit_logs').insert([{
-          action_type: 'تعديل',
-          student_name: editData.student_name,
-          student_id: editData.student_id,
-          subject_name: selectedSubject.name,
-          editor_name: editorName,
-          details: `تعديل بيانات الطالب (الاسم القديم: ${modal.dep.student_name})`
-        }]);
-        setDeprivations(deprivations.map(d => d.id === modal.dep.id ? { ...d, ...editData } : d));
+        const { error: editError } = await supabase.from('deprivations').update(editData).eq('id', modal.dep.id);
+        if (!editError) {
+          const newLog = {
+            action_type: 'تعديل',
+            student_name: editData.student_name,
+            student_id: editData.student_id,
+            subject_name: selectedSubject.name,
+            editor_name: editorName,
+            details: `تعديل بيانات الطالب (الاسم القديم: ${modal.dep.student_name})`
+          };
+          const { data: logData } = await supabase.from('audit_logs').insert([newLog]).select();
+          setDeprivations(deprivations.map(d => d.id === modal.dep.id ? { ...d, ...editData } : d));
+          if (logData) setSubjectLogs([logData[0], ...subjectLogs]);
+        }
       }
       setModal({ show: false, type: '', dep: null });
     } catch (err) {
@@ -173,7 +192,8 @@ export default function ControlPage() {
             <p>اختر إحدى المواد من القائمة الجانبية لعرض قائمة الطلاب المحرومين فيها.</p>
           </div>
         ) : (
-          <>
+          <div className="flex-1 overflow-y-auto flex flex-col print:block">
+            {/* Report Header */}
             <div className="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 rounded-t-2xl print:bg-white print:border-b-2">
               <div>
                 <h2 className="text-2xl font-bold text-slate-800">تقرير الحرمان: {selectedSubject.name}</h2>
@@ -191,6 +211,7 @@ export default function ControlPage() {
               </div>
             </div>
 
+            {/* Search Deprivations */}
             <div className="p-4 border-b border-slate-100 print:hidden">
               <div className="relative max-w-md">
                 <Search className="w-5 h-5 absolute right-3 top-2.5 text-slate-400" />
@@ -204,7 +225,8 @@ export default function ControlPage() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto p-4 print:overflow-visible print:p-0">
+            {/* Students Table */}
+            <div className="p-4 print:p-0">
               {loading ? (
                 <div className="text-center p-8 text-slate-500 font-bold">جاري التحميل...</div>
               ) : filteredDeps.length === 0 ? (
@@ -250,7 +272,50 @@ export default function ControlPage() {
                 </div>
               )}
             </div>
-          </>
+
+            {/* Audit Logs Section inside the Report */}
+            {!loading && subjectLogs.length > 0 && (
+              <div className="mt-8 p-4 border-t-4 border-slate-100 print:hidden bg-slate-50/50">
+                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
+                  <History className="w-5 h-5 text-indigo-500" />
+                  سجل التغييرات لهذه المادة
+                </h3>
+                <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                  <table className="w-full text-right text-sm">
+                    <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
+                      <tr>
+                        <th className="p-3 font-bold border-b">الوقت</th>
+                        <th className="p-3 font-bold border-b">نوع الإجراء</th>
+                        <th className="p-3 font-bold border-b">المُعدِّل</th>
+                        <th className="p-3 font-bold border-b">الطالب</th>
+                        <th className="p-3 font-bold border-b">تفاصيل</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {subjectLogs.map(log => (
+                        <tr key={log.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="p-3 font-mono text-slate-500 text-xs" dir="ltr">{new Date(log.created_at).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                          <td className="p-3">
+                            <span className={`px-2.5 py-1 rounded-md text-xs font-bold ${
+                              log.action_type === 'إضافة' ? 'bg-green-100 text-green-700' :
+                              log.action_type === 'تعديل' ? 'bg-blue-100 text-blue-700' :
+                              'bg-red-100 text-red-700'
+                            }`}>
+                              {log.action_type}
+                            </span>
+                          </td>
+                          <td className="p-3 font-bold text-slate-700 text-xs">{log.editor_name}</td>
+                          <td className="p-3 font-bold text-slate-700 text-xs">{log.student_name} <br/><span className="font-mono text-slate-400">{log.student_id}</span></td>
+                          <td className="p-3 text-slate-500 text-xs">{log.details}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            
+          </div>
         )}
       </div>
 
