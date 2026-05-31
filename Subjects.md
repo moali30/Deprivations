@@ -1,0 +1,68 @@
+# Course List
+
+- Accounting for Governmental & Non-Profit Organizations
+- Corporate Tax Accounting
+- Quantitative Methods for Business
+- Contemporary Issues in Accounting
+- International Accounting
+- Accounting Information System
+- الأساليب الكمية فى إتخاذ القرارات
+- الإتجاهات المعاصرة في المحاسبة
+- المحاسبة الدولية
+- نظم معلومات محاسبية
+- محاسبة متوسطة 2
+- أصول المراجعة (1)
+- المشتريات وإدارة المخزون
+- Intermediate Accounting-II
+- تكنولوجيا المعلومات
+- علم النفس
+- تأكيد الجودة فى التعليم
+- المدخل إلى المحاسبة (1)
+- المدخل إلى المحاسبة (2)
+- Business English (1)
+- رياضيات التمويل والإستثمار
+- السلوك التنظيمي
+- محاسبة تكاليف (1)
+- الإدارة العامة
+- إدارة الموارد البشرية
+- التأمين وإدارة المخاطر
+- تطبيقات الحاسب فى مجال الأعمال (1)
+- كتابة التقارير
+- لغة إنجليزية
+- الإقتصاد الجزئي
+- أصول الإدارة
+- Information Technology
+- Psychology
+- Quality Assurance in Education
+- Introduction to Accounting 1
+- Introduction to Accounting 2
+- Mathematics of Finance
+- Managing Organizational Behavior
+- Cost Accounting-I
+- Public Administration
+- Human Resource Management
+- Insurance & Mathematics
+- Computer Applications in Business (1)
+- Correspondences & Report Writing
+- Principles of Management
+- Microeconomics
+- Public Finance
+- Purchasing& Inventory Management
+- Quality Management
+- Strategic Management
+- Feasibility Studies
+- International Management
+- Contemporary Issues in Management
+
+---
+
+- المالية العامة
+- إدارة الجودة
+- الإدارة الإستراتيجية
+- نظرية التنظيم
+- نظم المعلومات الإدارية
+- الأساليب الكمية في أتخاذ القرارات
+- دراسة الجدوى
+- الإدارة الدولية
+- قضايا معاصرة في الإدارة
+- مشروع تخرج إدارة أعمال (2)
